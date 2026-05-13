@@ -1,0 +1,25 @@
+# Python
+
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+
+# Database
+*.db
+
+# Chroma DB
+chroma_db/
+
+# Node
+node_modules/
+
+# Vite
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
+venv/
+node_modules/
