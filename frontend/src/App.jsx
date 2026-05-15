@@ -1,5 +1,12 @@
+// src/App.jsx
+
 import { useState } from "react";
 import axios from "axios";
+
+import Navbar from "./components/Navbar";
+import Sidebar from "./components/Sidebar";
+import ChatMessage from "./components/ChatMessage";
+import Loader from "./components/Loader";
 
 function App() {
   const [file, setFile] = useState(null);
@@ -10,8 +17,13 @@ function App() {
 
   const [loading, setLoading] = useState(false);
 
+  const API_URL = "http://127.0.0.1:8000";
+
   const uploadPDF = async () => {
-    if (!file) return;
+    if (!file) {
+      alert("Please select a PDF");
+      return;
+    }
 
     const formData = new FormData();
 
@@ -20,7 +32,7 @@ function App() {
     try {
       setLoading(true);
 
-      await axios.post("http://127.0.0.1:8000/upload", formData);
+      await axios.post(`${API_URL}/upload`, formData);
 
       alert("PDF Uploaded Successfully");
     } catch (error) {
@@ -45,7 +57,7 @@ function App() {
     try {
       setLoading(true);
 
-      const response = await axios.post("http://127.0.0.1:8000/chat", {
+      const response = await axios.post(`${API_URL}/chat`, {
         question: question,
       });
 
@@ -68,73 +80,58 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white p-6">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-6 text-center">
-          AI Research Assistant
-        </h1>
+    <div className="min-h-screen bg-slate-950 text-white flex">
+      <Sidebar
+        file={file}
+        setFile={setFile}
+        uploadPDF={uploadPDF}
+        loading={loading}
+      />
 
-        <div className="bg-slate-800 p-6 rounded-xl mb-6">
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={(e) => setFile(e.target.files[0])}
-            className="mb-4"
-          />
+      <div className="flex-1 flex flex-col">
+        <Navbar />
 
-          <button
-            onClick={uploadPDF}
-            className="bg-blue-600 px-5 py-2 rounded-lg hover:bg-blue-700"
-          >
-            Upload PDF
-          </button>
-        </div>
-
-        <div className="bg-slate-800 rounded-xl p-6 h-[500px] overflow-y-auto mb-6">
-          {messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`mb-4 ${
-                msg.type === "user" ? "text-right" : "text-left"
-              }`}
-            >
-              <div
-                className={`inline-block p-4 rounded-xl max-w-[80%] ${
-                  msg.type === "user" ? "bg-blue-600" : "bg-slate-700"
-                }`}
-              >
-                {msg.text}
-              </div>
-
-              {msg.sources && (
-                <div className="text-sm text-gray-400 mt-2">
-                  Sources:
-                  {msg.sources.map((src, i) => (
-                    <div key={i}>{src.source}</div>
-                  ))}
+        <div className="flex-1 p-6 overflow-hidden">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl h-full flex flex-col shadow-2xl">
+            {/* CHAT AREA */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {messages.length === 0 && (
+                <div className="h-full flex items-center justify-center text-slate-500 text-lg">
+                  Upload a PDF and start asking questions
                 </div>
               )}
+
+              {messages.map((msg, index) => (
+                <ChatMessage key={index} msg={msg} />
+              ))}
+
+              {loading && <Loader />}
             </div>
-          ))}
 
-          {loading && <div className="text-gray-400">AI is thinking...</div>}
-        </div>
+            {/* INPUT AREA */}
+            <div className="border-t border-slate-800 p-4 flex gap-4">
+              <input
+                type="text"
+                placeholder="Ask anything from your PDF..."
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    askQuestion();
+                  }
+                }}
+                className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-blue-500"
+              />
 
-        <div className="flex gap-4">
-          <input
-            type="text"
-            placeholder="Ask a question..."
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            className="flex-1 p-3 rounded-lg bg-slate-800 border border-slate-700"
-          />
-
-          <button
-            onClick={askQuestion}
-            className="bg-green-600 px-6 py-3 rounded-lg hover:bg-green-700"
-          >
-            Send
-          </button>
+              <button
+                onClick={askQuestion}
+                disabled={loading}
+                className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-xl font-semibold transition"
+              >
+                Send
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

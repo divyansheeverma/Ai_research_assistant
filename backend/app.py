@@ -1,6 +1,8 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from .rag_pipeline import process_pdf, ask_question
+from fastapi.responses import StreamingResponse
+
 import shutil
 import os
 
@@ -46,6 +48,29 @@ async def chat(data: dict):
 
     response = ask_question(question)
 
-    return {
-        "response": response
-    }
+    
+    return response
+@app.post("/stream-chat")
+async def stream_chat(data: dict):
+
+    async def generate():
+
+        response = ask_question(data["question"])
+
+        for word in response.split():
+            yield word + " "
+
+    return StreamingResponse(generate())
+@app.post("/upload")
+async def upload(files: list[UploadFile]):
+
+    for file in files:
+
+        contents = await file.read()
+
+        with open(file.filename, "wb") as f:
+            f.write(contents)
+
+        process_pdf(file.filename)
+
+    return {"message": "Files uploaded"}

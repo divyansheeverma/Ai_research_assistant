@@ -1,13 +1,19 @@
-from langchain_ollama import OllamaLLM
+import os
+
+from dotenv import load_dotenv
 from langchain.chains import RetrievalQA
+from langchain_groq import ChatGroq
 
 from .pdf_loader import load_and_split_pdf
 from .database import create_vector_db, get_vector_db
 
+load_dotenv()
 
-llm = OllamaLLM(
-    model="tinyllama"
+llm = ChatGroq(
+    groq_api_key=os.getenv("GROQ_API_KEY"),
+    model_name="llama-3.1-8b-instant"
 )
+
 
 
 def process_pdf(file_path):

@@ -2,6 +2,16 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 
+
+def load_pdf(file_path):
+
+    loader = PyPDFLoader(file_path)
+
+    documents = loader.load()
+
+    return documents
+
+
 def load_and_split_pdf(file_path):
 
     loader = PyPDFLoader(file_path)

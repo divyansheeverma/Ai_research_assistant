@@ -7,20 +7,50 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-venv/
+# Node modules
 node_modules/
 
-# Editor directories and files
+# Build folders
+dist/
+dist-ssr/
+build/
+
+# Local env files
+.env
+.env.local
+*.local
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Database / Vector DB
+*.db
+chroma_db/
+
+# Uploads
+uploads/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+.idea/
+
+# Visual Studio
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Coverage
+coverage/
+
+# Temporary files
+tmp/
+temp/
